@@ -1,24 +1,33 @@
 import tensorflow as tf
 
 class LeNet(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, original=True):
         super().__init__()
+        self.original = original
 
     def _feature_extraction(self, x):
+        if self.original:
+            nonlinearity = "sigmoid"
+            pooling = tf.keras.layers.AveragePooling2D
+        else:
+            nonlinearity = "relu"
+            pooling = tf.keras.layers.MaxPooling2D
+        
         x = tf.keras.layers.Conv2D(
-            filters=6, kernel_size=(5, 5), activation="sigmoid"
+            filters=6, kernel_size=(5, 5), activation=nonlinearity
         )(x)
-        x = tf.keras.layers.AveragePooling2D(pool_size=(2, 2))(x)
+        x = pooling(pool_size=(2, 2))(x)
         x = tf.keras.layers.Conv2D(
-            filters=16, kernel_size=(5, 5), activation="sigmoid"
+            filters=16, kernel_size=(5, 5), activation=nonlinearity
         )(x)
-        x = tf.keras.layers.AveragePooling2D(pool_size=(2, 2))(x)
+        x = pooling(pool_size=(2, 2))(x)
         x = tf.keras.layers.Flatten()(x)
         return x
 
     def _classifier(self, x):
-        x = tf.keras.layers.Dense(units=120, activation="sigmoid")(x)
-        x = tf.keras.layers.Dense(units=84, activation="sigmoid")(x)
+        nonlinearity = "sigmoid" if self.original else "relu"
+        x = tf.keras.layers.Dense(units=120, activation=nonlinearity)(x)
+        x = tf.keras.layers.Dense(units=84, activation=nonlinearity)(x)
         x = tf.keras.layers.Dense(units=10, activation="softmax", name="softmax")(x)
         return x
 
