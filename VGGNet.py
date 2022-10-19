@@ -1,11 +1,13 @@
 import tensorflow as tf
 
+
 class VGGNet(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, num_classes):
         super().__init__()
+        self.num_classes = num_classes
 
     def _feature_extraction(self, x):
-        def conv(filters):
+        def _conv_layer(filters):
             return tf.keras.layers.Conv2D(
                 filters=filters, 
                 kernel_size=(3, 3), 
@@ -18,31 +20,31 @@ class VGGNet(tf.keras.Model):
         )
 
         # Input: 224 * 224 * 3
-        x = conv(64)(x)
-        x = conv(64)(x)
+        x = _conv_layer(64)(x)
+        x = _conv_layer(64)(x)
         # 224 * 224 * 64
         x = pool(x)
         # 112 * 112 * 64
-        x = conv(128)(x)
-        x = conv(128)(x)
+        x = _conv_layer(128)(x)
+        x = _conv_layer(128)(x)
         # 112 * 112 * 128
         x = pool(x)
         # 56 * 56 * 128
-        x = conv(256)(x)
-        x = conv(256)(x)
-        x = conv(256)(x)
+        x = _conv_layer(256)(x)
+        x = _conv_layer(256)(x)
+        x = _conv_layer(256)(x)
         # 56 * 56 * 256
         x = pool(x)
         # 28 * 28 * 256
-        x = conv(512)(x)
-        x = conv(512)(x)
-        x = conv(512)(x)
+        x = _conv_layer(512)(x)
+        x = _conv_layer(512)(x)
+        x = _conv_layer(512)(x)
         # 28 * 28 * 512
         x = pool(x)
         # 14 * 14 * 512
-        x = conv(512)(x)
-        x = conv(512)(x)
-        x = conv(512)(x)
+        x = _conv_layer(512)(x)
+        x = _conv_layer(512)(x)
+        x = _conv_layer(512)(x)
         # 14 * 14 * 512
         x = pool(x)
         # 7 * 7 * 512
@@ -57,7 +59,7 @@ class VGGNet(tf.keras.Model):
             units=4096, activation="relu"
         )(x)
         x = tf.keras.layers.Dense(
-            units=1000, activation="softmax"
+            units=self.num_classes, activation="softmax"
         )(x)
         return x
 
@@ -75,7 +77,7 @@ class VGGNet(tf.keras.Model):
         return x
 
 if __name__ == "__main__": 
-    model = VGGNet()
+    model = VGGNet(num_classes=1000)
     model = model.build((224, 224, 3))
     model.summary()
 

@@ -1,8 +1,10 @@
 import tensorflow as tf
 
+
 class AlexNet(tf.keras.Model):
-    def __init__(self):
+    def __init__(self, num_classes):
         super().__init__()
+        self.num_classes = num_classes
 
     def _feature_extraction(self, x):
         x = tf.keras.layers.Conv2D(
@@ -42,7 +44,7 @@ class AlexNet(tf.keras.Model):
         )(x)
         x = tf.keras.layers.Dropout(rate=0.5)(x)
         x = tf.keras.layers.Dense(
-            units=1000, activation="softmax"
+            units=self.num_classes, activation="softmax"
         )(x)
         return x
 
@@ -61,7 +63,7 @@ class AlexNet(tf.keras.Model):
 
 
 if __name__ == "__main__": 
-    model = AlexNet()
+    model = AlexNet(num_classes=1000)
     model = model.build((227, 227, 3))
     model.summary()
 

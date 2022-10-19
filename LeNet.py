@@ -1,8 +1,10 @@
 import tensorflow as tf
 
+
 class LeNet(tf.keras.Model):
-    def __init__(self, original=True):
+    def __init__(self, num_classes, original=True):
         super().__init__()
+        self.num_classes = num_classes
         self.original = original
 
     def _feature_extraction(self, x):
@@ -26,9 +28,15 @@ class LeNet(tf.keras.Model):
 
     def _classifier(self, x):
         nonlinearity = "sigmoid" if self.original else "relu"
-        x = tf.keras.layers.Dense(units=120, activation=nonlinearity)(x)
-        x = tf.keras.layers.Dense(units=84, activation=nonlinearity)(x)
-        x = tf.keras.layers.Dense(units=10, activation="softmax", name="softmax")(x)
+        x = tf.keras.layers.Dense(
+            units=120, activation=nonlinearity
+        )(x)
+        x = tf.keras.layers.Dense(
+            units=84, activation=nonlinearity
+        )(x)
+        x = tf.keras.layers.Dense(
+            units=self.num_classes, activation="softmax", name="softmax"
+        )(x)
         return x
 
     def build(self, input_shape):
@@ -46,7 +54,7 @@ class LeNet(tf.keras.Model):
 
 
 if __name__ == "__main__": 
-    model = LeNet()
+    model = LeNet(num_classes=10)
     model = model.build((28, 28, 1))
     model.summary()
 
